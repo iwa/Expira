@@ -1,4 +1,4 @@
-# Domain Expiry Watcher
+# Expira, a basic domain expiry monitor
 
 Console application which checks domain name date expiry, with notification support.
 
