@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/iwa/domain-expiry-watcher/internal/state"
+	"github.com/iwa/Expira/internal/state"
 )
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {

@@ -3,7 +3,7 @@ package utils
 import (
 	"time"
 
-	"github.com/iwa/domain-expiry-watcher/internal/state"
+	"github.com/iwa/Expira/internal/state"
 )
 
 func ReportStatusInConsole(appState *state.AppState) {

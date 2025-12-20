@@ -10,7 +10,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
-	"github.com/iwa/domain-expiry-watcher/internal/state"
+	"github.com/iwa/Expira/internal/state"
 )
 
 func ImportEnv(appState *state.AppState) {

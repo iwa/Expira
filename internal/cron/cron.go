@@ -3,8 +3,8 @@ package cron
 import (
 	"time"
 
-	"github.com/iwa/domain-expiry-watcher/internal/state"
-	"github.com/iwa/domain-expiry-watcher/internal/utils"
+	"github.com/iwa/Expira/internal/state"
+	"github.com/iwa/Expira/internal/utils"
 )
 
 func StartCronLoop(appState *state.AppState) {

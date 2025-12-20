@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/iwa/domain-expiry-watcher/internal/api"
-	"github.com/iwa/domain-expiry-watcher/internal/cron"
-	"github.com/iwa/domain-expiry-watcher/internal/state"
-	"github.com/iwa/domain-expiry-watcher/internal/utils"
+	"github.com/iwa/Expira/internal/api"
+	"github.com/iwa/Expira/internal/cron"
+	"github.com/iwa/Expira/internal/state"
+	"github.com/iwa/Expira/internal/utils"
 )
 
 var titleStyle = lipgloss.NewStyle().

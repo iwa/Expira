@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/iwa/domain-expiry-watcher/internal/state"
-	"github.com/iwa/domain-expiry-watcher/internal/utils/providers"
+	"github.com/iwa/Expira/internal/state"
+	"github.com/iwa/Expira/internal/utils/providers"
 )
 
 func Notify(appState *state.AppState) {

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/iwa/domain-expiry-watcher/internal/state"
+	"github.com/iwa/Expira/internal/state"
 )
 
 func SendNtfyMessage(appState *state.AppState, message string) error {

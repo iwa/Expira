@@ -2,71 +2,71 @@ name: Release flow on tag push
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: iwa/domain-expiry-watcher
+  IMAGE_NAME: iwa/Expira
 
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   build_binary:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5.5.0
-      with:
-        go-version: '1.24'
+      - name: Set up Go
+        uses: actions/setup-go@v5.5.0
+        with:
+          go-version: "1.24"
 
-    - name: Build for Linux x86
-      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o domain-expiry-watcher-linux-x86 ./cmd/domain-expiry-watcher/main.go
+      - name: Build for Linux x86
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o expira-linux-x86 ./cmd/expira/main.go
 
-    - name: Build for Linux ARM64
-      run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o domain-expiry-watcher-linux-arm64 ./cmd/domain-expiry-watcher/main.go
+      - name: Build for Linux ARM64
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o expira-linux-arm64 ./cmd/expira/main.go
 
-    - name: Upload binaries as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-linux-binary
-        path: |
-          ./domain-expiry-watcher-linux-x86
-          ./domain-expiry-watcher-linux-arm64
+      - name: Upload binaries as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-linux-binary
+          path: |
+            ./expira-linux-x86
+            ./expira-linux-arm64
 
   build_docker:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Log in to the Container registry
-      uses: docker/login-action@v3.4.0
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract version from tag
-      id: tag
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Extract version from tag
+        id: tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-    - name: Setup Docker QEMU
-      uses: docker/setup-qemu-action@v3.6.0
+      - name: Setup Docker QEMU
+        uses: docker/setup-qemu-action@v3.6.0
 
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v3.11.1
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.1
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v6.18.0
-      with:
-        context: .
-        push: true
-        platforms: linux/amd64, linux/arm64
-        tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.VERSION }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64, linux/arm64
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.VERSION }}
 
   release:
     needs: [build_binary, build_docker]
@@ -125,5 +125,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
-          gh release upload "$tag" ./binary/domain-expiry-watcher-linux-x86
-          gh release upload "$tag" ./binary/domain-expiry-watcher-linux-arm64
+          gh release upload "$tag" ./binary/expira-linux-x86
+          gh release upload "$tag" ./binary/expira-linux-arm64

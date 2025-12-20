@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/iwa/domain-expiry-watcher/internal/state"
+	"github.com/iwa/Expira/internal/state"
 )
 
 type DiscordMessage struct {

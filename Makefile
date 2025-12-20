@@ -1,10 +1,10 @@
 all: build
 
 build: go.mod
-	go build -o bin/domain-expiry-watcher cmd/domain-expiry-watcher/main.go
+	go build -o bin/expira cmd/expira/main.go
 
 run:
-	go run cmd/domain-expiry-watcher/main.go
+	go run cmd/expira/main.go
 
 clean:
 	rm -r bin
