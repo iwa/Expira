@@ -18,9 +18,11 @@ type TelegramMessage struct {
 	ProtectContent      bool   `json:"protect_content"`
 }
 
-func SendTelegramMessage(appState *state.AppState, message string) error {
+// SendTelegramMessage sends a notification message via Telegram API.
+// It uses configuration from the provided Config instance.
+func SendTelegramMessage(config *state.Config, message string) error {
 	payload := TelegramMessage{
-		ChatID:              appState.TelegramChatID,
+		ChatID:              config.TelegramChatID,
 		Text:                message,
 		ParseMode:           "HTML",
 		DisableNotification: true,
@@ -32,7 +34,7 @@ func SendTelegramMessage(appState *state.AppState, message string) error {
 		return err
 	}
 
-	resp, err := http.Post(fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", appState.TelegramToken), "application/json", bytes.NewBuffer(data))
+	resp, err := http.Post(fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", config.TelegramToken), "application/json", bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}

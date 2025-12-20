@@ -7,7 +7,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/iwa/Expira/internal/api"
 	"github.com/iwa/Expira/internal/cron"
-	"github.com/iwa/Expira/internal/state"
 	"github.com/iwa/Expira/internal/utils"
 )
 
@@ -25,23 +24,27 @@ var titleStyle = lipgloss.NewStyle().
 func main() {
 	fmt.Println(titleStyle.Render("Domain Expiry Watcher"))
 
-	appState := state.GetInstance()
-
-	utils.ImportEnv(appState)
+	// Load configuration and initialize domain store using dependency injection
+	config, store := utils.LoadConfig()
 
 	println("[INFO] Starting domain expiry watcher...")
 
-	utils.UpdateDomains(appState)
+	// Update domain expiry dates from WHOIS servers
+	utils.UpdateDomains(store)
 
-	utils.ReportStatusInConsole(appState)
+	// Display domain status in console
+	utils.ReportStatusInConsole(store)
 
-	utils.Notify(appState)
+	// Send initial notifications if needed
+	utils.Notify(store, config)
 
+	// Setup HTTP API endpoints with dependency injection
 	http.HandleFunc("/health", api.HealthHandler)
-	http.HandleFunc("/status", api.StatusHandler)
+	http.HandleFunc("/status", api.StatusHandlerFactory(store))
 	go http.ListenAndServe("0.0.0.0:8080", nil)
 
-	cron.StartCronLoop(appState)
+	// Start cron job for daily domain updates
+	cron.StartCronLoop(store, config)
 
 	select {} // Keep the main goroutine running
 }

@@ -9,8 +9,10 @@ import (
 	"github.com/iwa/Expira/internal/state"
 )
 
-func SendNtfyMessage(appState *state.AppState, message string) error {
-	req, _ := http.NewRequest("POST", appState.NtfyURL,
+// SendNtfyMessage sends a notification message via Ntfy.
+// It uses configuration from the provided Config instance.
+func SendNtfyMessage(config *state.Config, message string) error {
+	req, _ := http.NewRequest("POST", config.NtfyURL,
 		strings.NewReader(message))
 
 	req.Header.Set("Title", "Domain expiry alert")
