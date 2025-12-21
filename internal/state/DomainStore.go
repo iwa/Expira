@@ -1,6 +1,7 @@
 package state
 
 import (
+	"maps"
 	"sync"
 )
 
@@ -40,20 +41,20 @@ func (ds *DomainStore) GetAllDomains() map[string]Domain {
 
 	// Create a copy to avoid exposing internal map
 	domainsCopy := make(map[string]Domain, len(ds.domains))
-	for k, v := range ds.domains {
-		domainsCopy[k] = v
-	}
+	maps.Copy(domainsCopy, ds.domains)
 
 	return domainsCopy
 }
 
-// SetDomains replaces all domains with the provided map.
-// This is useful for bulk initialization.
-func (ds *DomainStore) SetDomains(domains map[string]Domain) {
+// SetBulkDomains replaces all domains with the provided map.
+func (ds *DomainStore) SetBulkDomains(domains map[string]Domain) {
 	ds.mu.Lock()
 	defer ds.mu.Unlock()
 
-	ds.domains = domains
+	domainsCopy := make(map[string]Domain, len(domains))
+	maps.Copy(domainsCopy, domains)
+
+	ds.domains = domainsCopy
 }
 
 // Count returns the number of domains in the store
