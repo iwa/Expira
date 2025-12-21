@@ -36,24 +36,13 @@ func (app *App) Start() error {
 	server := api.NewServer("0.0.0.0:8080", app.Store)
 	server.Start()
 
-	// Start cron job in goroutine
-	cronErrors := make(chan error, 1)
-	go func() {
-		cron.StartCronLoop(app.Store, app.Config)
-		cronErrors <- fmt.Errorf("cron loop unexpectedly stopped")
-	}()
+	// Start cron job
+	cron.StartCronLoop(app.Store, app.Config)
 
 	// Block the main go routine with error handling
-	select {
-	case err := <-server.Errors():
-		if shutdownErr := server.Shutdown(5 * time.Second); shutdownErr != nil {
-			return fmt.Errorf("server error: %w, shutdown error: %v", err, shutdownErr)
-		}
-		return err
-	case err := <-cronErrors:
-		if shutdownErr := server.Shutdown(5 * time.Second); shutdownErr != nil {
-			return fmt.Errorf("cron error: %w, shutdown error: %v", err, shutdownErr)
-		}
-		return err
+	err := <-server.Errors()
+	if shutdownErr := server.Shutdown(5 * time.Second); shutdownErr != nil {
+		return fmt.Errorf("server error: %w, shutdown error: %v", err, shutdownErr)
 	}
+	return err
 }
