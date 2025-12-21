@@ -73,7 +73,7 @@ func importDomains(store *state.DomainStore) string {
 		panic("[ERROR] No valid domains found in the DOMAINS environment variable.")
 	}
 
-	store.SetDomains(domainMap)
+	store.SetBulkDomains(domainMap)
 
 	log = fmt.Sprintln(log, "Imported domains:", len(domainMap))
 
