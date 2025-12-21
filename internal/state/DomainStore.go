@@ -4,21 +4,17 @@ import (
 	"sync"
 )
 
-// DomainStore provides thread-safe access to domain data.
-// It uses a read-write mutex to allow concurrent reads while ensuring safe writes.
 type DomainStore struct {
 	mu      sync.RWMutex
 	domains map[string]Domain
 }
 
-// NewDomainStore creates a new DomainStore instance
 func NewDomainStore() *DomainStore {
 	return &DomainStore{
 		domains: make(map[string]Domain),
 	}
 }
 
-// GetDomain retrieves a domain by name.
 // Returns the domain and true if found, or an empty domain and false if not found.
 func (ds *DomainStore) GetDomain(name string) (Domain, bool) {
 	ds.mu.RLock()
@@ -28,7 +24,6 @@ func (ds *DomainStore) GetDomain(name string) (Domain, bool) {
 	return domain, ok
 }
 
-// SetDomain stores or updates a domain.
 // This method is thread-safe and can be called from multiple goroutines.
 func (ds *DomainStore) SetDomain(name string, domain Domain) {
 	ds.mu.Lock()
