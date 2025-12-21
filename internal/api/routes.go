@@ -9,30 +9,34 @@ import (
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	fmt.Fprintf(w, "Service is running")
 }
 
-// GET /status
-// Get a status report of all monitored domains and their expiry dates.
-func StatusHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		return
-	}
-
-	var status string = "Domain Expiry Watcher Status:\n\n"
-
-	appState := state.GetInstance()
-
-	for _, domain := range appState.Domains {
-		if domain.ExpiryDate.IsZero() {
-			status += fmt.Sprintf("Domain %s: Expiry date not set\n", domain.Name)
-		} else {
-			status += fmt.Sprintf("Domain %s: Expires on %s\n", domain.Name, domain.ExpiryDate.Format("2006-01-02"))
+// StatusHandlerFactory creates a status handler with access to the domain store.
+// This allows the handler to use dependency injection instead of global state.
+func StatusHandlerFactory(store *state.DomainStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
 		}
-	}
 
-	fmt.Fprintf(w, "%s", status)
+		var status string = "Domain Expiry Watcher Status:\n\n"
+
+		domains := store.GetAllDomains()
+
+		for _, domain := range domains {
+			if domain.ExpiryDate.IsZero() {
+				status += fmt.Sprintf("Domain %s: Expiry date not set\n", domain.Name)
+			} else {
+				status += fmt.Sprintf("Domain %s: Expires on %s\n", domain.Name, domain.ExpiryDate.Format("2006-01-02"))
+			}
+		}
+
+		fmt.Fprintf(w, "%s", status)
+	}
 }

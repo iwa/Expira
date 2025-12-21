@@ -14,7 +14,9 @@ type DiscordMessage struct {
 	Content string `json:"content"`
 }
 
-func SendDiscordMessage(appState *state.AppState, message string) error {
+// SendDiscordMessage sends a notification message via Discord webhook.
+// It uses configuration from the provided Config instance.
+func SendDiscordMessage(config *state.Config, message string) error {
 	payload := DiscordMessage{
 		Content: message,
 	}
@@ -24,7 +26,7 @@ func SendDiscordMessage(appState *state.AppState, message string) error {
 		return err
 	}
 
-	resp, err := http.Post(appState.DiscordWebhookURL, "application/json", bytes.NewBuffer(data))
+	resp, err := http.Post(config.DiscordWebhookURL, "application/json", bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}

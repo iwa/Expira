@@ -6,14 +6,17 @@ import (
 	"github.com/iwa/Expira/internal/state"
 )
 
-func ReportStatusInConsole(appState *state.AppState) {
+// ReportStatusInConsole displays the current status of all domains in the console.
+// It uses the provided store to read domain data.
+func ReportStatusInConsole(store *state.DomainStore) {
 	println("[INFO] Generating domains report...")
 
 	println("\n --- Current Domains Status ---")
 
 	currentTime := time.Now()
 
-	for domain, domainData := range appState.Domains {
+	domains := store.GetAllDomains()
+	for domain, domainData := range domains {
 		daysLeft := int(domainData.ExpiryDate.Sub(currentTime).Hours()/24) + 1
 		println("Domain:", domain, "- In", daysLeft, "Days - Expiry date:", domainData.ExpiryDate.Format("2006-01-02 15:04:05"))
 	}

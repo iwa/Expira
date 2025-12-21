@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"net/http"
+	"log"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/iwa/Expira/internal/api"
-	"github.com/iwa/Expira/internal/cron"
-	"github.com/iwa/Expira/internal/state"
-	"github.com/iwa/Expira/internal/utils"
+	"github.com/iwa/Expira/internal/app"
 )
 
 var titleStyle = lipgloss.NewStyle().
@@ -25,23 +22,8 @@ var titleStyle = lipgloss.NewStyle().
 func main() {
 	fmt.Println(titleStyle.Render("Domain Expiry Watcher"))
 
-	appState := state.GetInstance()
-
-	utils.ImportEnv(appState)
-
-	println("[INFO] Starting domain expiry watcher...")
-
-	utils.UpdateDomains(appState)
-
-	utils.ReportStatusInConsole(appState)
-
-	utils.Notify(appState)
-
-	http.HandleFunc("/health", api.HealthHandler)
-	http.HandleFunc("/status", api.StatusHandler)
-	go http.ListenAndServe("0.0.0.0:8080", nil)
-
-	cron.StartCronLoop(appState)
-
-	select {} // Keep the main goroutine running
+	app := app.New()
+	if err := app.Start(); err != nil {
+		log.Fatalf("Application error: %v", err)
+	}
 }

@@ -12,21 +12,26 @@ import (
 	"github.com/iwa/Expira/internal/state"
 )
 
-func UpdateDomains(appState *state.AppState) {
+// UpdateDomains queries WHOIS servers for all domains in the store and updates their expiry dates.
+// This function is thread-safe and can be called concurrently with other store operations.
+func UpdateDomains(store *state.DomainStore) {
 	println("[INFO] Updating domains...")
 
 	var wg sync.WaitGroup
 
-	for domain, domainData := range appState.Domains {
+	// Get all domains from the store
+	domains := store.GetAllDomains()
+
+	for domain, domainData := range domains {
 		wg.Add(1)
-		go updateDomainExpiry(appState, domain, domainData, &wg)
+		go updateDomainExpiry(store, domain, domainData, &wg)
 	}
 
 	wg.Wait()
 	println("[INFO] All domains updated.")
 }
 
-func updateDomainExpiry(appState *state.AppState, domain string, domainData state.Domain, wg *sync.WaitGroup) {
+func updateDomainExpiry(store *state.DomainStore, domain string, domainData state.Domain, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	res, err := getDomainExpiry(domain)
@@ -41,7 +46,7 @@ func updateDomainExpiry(appState *state.AppState, domain string, domainData stat
 	}
 
 	domainData.ExpiryDate = res
-	appState.Domains[domain] = domainData
+	store.SetDomain(domain, domainData)
 
 	println("[INFO] Domain:", domain, "- Expiry date:", res.Format("2006-01-02 15:04:05"))
 }

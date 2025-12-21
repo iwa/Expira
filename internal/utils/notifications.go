@@ -8,35 +8,39 @@ import (
 	"github.com/iwa/Expira/internal/utils/providers"
 )
 
-func Notify(appState *state.AppState) {
+// Notify checks all domains and sends notifications if they are approaching expiry.
+// It uses the provided store for domain data and config for notification settings.
+func Notify(store *state.DomainStore, config *state.Config) {
 	println("[INFO] Sending notifications...")
 
-	for domain, domainData := range appState.Domains {
-		daysUntil, shouldNotify := checkDaysForNotification(domainData.ExpiryDate, appState.NotificationDays)
+	domains := store.GetAllDomains()
+
+	for domain, domainData := range domains {
+		daysUntil, shouldNotify := checkDaysForNotification(domainData.ExpiryDate, config.NotificationDays)
 
 		if shouldNotify {
-			if appState.TelegramNotification && (appState.TelegramChatID != "" && appState.TelegramToken != "") {
+			if config.TelegramNotification && (config.TelegramChatID != "" && config.TelegramToken != "") {
 				message := fmt.Sprintf("<b>⚠️ Domain %s will expire in %d days </b>\nExpiry date: <code>%s</code>", domain, daysUntil, domainData.ExpiryDate.Format("2006-01-02 15:04:05"))
 
-				err := providers.SendTelegramMessage(appState, message)
+				err := providers.SendTelegramMessage(config, message)
 				if err != nil {
 					println("[ERROR] Failed to send notification for domain", domain, ":", err)
 				}
 			}
 
-			if appState.DiscordNotification && appState.DiscordWebhookURL != "" {
+			if config.DiscordNotification && config.DiscordWebhookURL != "" {
 				message := fmt.Sprintf("**⚠️ Domain %s will expire in %d days**\nExpiry date: `%s`", domain, daysUntil, domainData.ExpiryDate.Format("2006-01-02 15:04:05"))
 
-				err := providers.SendDiscordMessage(appState, message)
+				err := providers.SendDiscordMessage(config, message)
 				if err != nil {
 					println("[ERROR] Failed to send notification for domain", domain, ":", err)
 				}
 			}
 
-			if appState.NtfyNotification && appState.NtfyURL != "" {
+			if config.NtfyNotification && config.NtfyURL != "" {
 				message := fmt.Sprintf("Domain %s will expire in %d days \nExpiry date: %s", domain, daysUntil, domainData.ExpiryDate.Format("2006-01-02 15:04:05"))
 
-				err := providers.SendNtfyMessage(appState, message)
+				err := providers.SendNtfyMessage(config, message)
 				if err != nil {
 					println("[ERROR] Failed to send notification for domain", domain, ":", err)
 				}
