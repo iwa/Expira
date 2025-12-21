@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/iwa/Expira/internal/app"
@@ -22,7 +23,7 @@ func main() {
 	fmt.Println(titleStyle.Render("Domain Expiry Watcher"))
 
 	app := app.New()
-	app.Start()
-
-	select {} // Keep the main goroutine running
+	if err := app.Start(); err != nil {
+		log.Fatalf("Application error: %v", err)
+	}
 }

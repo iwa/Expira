@@ -1,7 +1,8 @@
 package app
 
 import (
-	"net/http"
+	"fmt"
+	"time"
 
 	"github.com/iwa/Expira/internal/api"
 	"github.com/iwa/Expira/internal/cron"
@@ -25,17 +26,34 @@ func New() *App {
 }
 
 // Start runs the application
-func (app *App) Start() {
+func (app *App) Start() error {
 	// Initial domain update and notification
 	utils.UpdateDomains(app.Store)
 	utils.ReportStatusInConsole(app.Store)
 	utils.Notify(app.Store, app.Config)
 
-	// Setup HTTP server
-	http.HandleFunc("/health", api.HealthHandler)
-	http.HandleFunc("/status", api.StatusHandlerFactory(app.Store))
-	go http.ListenAndServe("0.0.0.0:8080", nil)
+	// Start HTTP server
+	server := api.NewServer("0.0.0.0:8080", app.Store)
+	server.Start()
 
-	// Start cron job
-	cron.StartCronLoop(app.Store, app.Config)
+	// Start cron job in goroutine
+	cronErrors := make(chan error, 1)
+	go func() {
+		cron.StartCronLoop(app.Store, app.Config)
+		cronErrors <- fmt.Errorf("cron loop unexpectedly stopped")
+	}()
+
+	// Block the main go routine with error handling
+	select {
+	case err := <-server.Errors():
+		if shutdownErr := server.Shutdown(5 * time.Second); shutdownErr != nil {
+			return fmt.Errorf("server error: %w, shutdown error: %v", err, shutdownErr)
+		}
+		return err
+	case err := <-cronErrors:
+		if shutdownErr := server.Shutdown(5 * time.Second); shutdownErr != nil {
+			return fmt.Errorf("cron error: %w, shutdown error: %v", err, shutdownErr)
+		}
+		return err
+	}
 }
