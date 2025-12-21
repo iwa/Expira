@@ -1,7 +1,7 @@
 package state
 
-// Config holds immutable configuration loaded from environment variables at startup.
-// This configuration does not change during the application lifecycle.
+// Config holds configuration loaded from environment variables at startup.
+// This configuration should never change during the application lifecycle.
 type Config struct {
 	NotificationDays []int
 

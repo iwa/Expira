@@ -7,7 +7,7 @@ import (
 	"github.com/iwa/Expira/internal/utils"
 )
 
-// StartCronLoop starts a hourly cron job that runs domain updates at midnight.
+// StartCronLoop starts an hourly cron job that runs domain updates at midnight.
 // It uses dependency injection to access the domain store and configuration.
 func StartCronLoop(store *state.DomainStore, config *state.Config) {
 	println("[INFO] Starting cron job...")
