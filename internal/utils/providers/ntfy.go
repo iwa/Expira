@@ -12,8 +12,10 @@ import (
 // SendNtfyMessage sends a notification message via Ntfy.
 // It uses configuration from the provided Config instance.
 func SendNtfyMessage(config *state.Config, message string) error {
-	req, _ := http.NewRequest("POST", config.NtfyURL,
-		strings.NewReader(message))
+	req, err := http.NewRequest("POST", config.NtfyURL, strings.NewReader(message))
+	if err != nil {
+		return err
+	}
 
 	req.Header.Set("Title", "Domain expiry alert")
 	req.Header.Set("Priority", "urgent")
