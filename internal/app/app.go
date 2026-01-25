@@ -19,8 +19,7 @@ type App struct {
 }
 
 // New creates and initializes a new App instance
-func New() *App {
-	config, store := utils.LoadConfig()
+func New(config *state.Config, store *state.DomainStore) *App {
 	return &App{
 		Config: config,
 		Store:  store,

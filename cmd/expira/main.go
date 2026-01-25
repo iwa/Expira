@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/iwa/Expira/internal/app"
+	"github.com/iwa/Expira/internal/utils"
 )
 
 var titleStyle = lipgloss.NewStyle().
@@ -22,7 +23,10 @@ var titleStyle = lipgloss.NewStyle().
 func main() {
 	fmt.Println(titleStyle.Render("Domain Expiry Watcher"))
 
-	app := app.New()
+	config, store := utils.LoadConfig()
+
+	app := app.New(config, store)
+
 	if err := app.Start(); err != nil {
 		log.Fatalf("Application error: %v", err)
 	}
