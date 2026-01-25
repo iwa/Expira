@@ -17,7 +17,17 @@ func ReportStatusInConsole(store *state.DomainStore) {
 
 	domains := store.GetAllDomains()
 	for domain, domainData := range domains {
+		if !domainData.Exists {
+			println("Domain:", domain, "- No expiry date available, domain might not exist")
+			continue
+		}
+
 		daysLeft := int(domainData.ExpiryDate.Sub(currentTime).Hours()/24) + 1
+		if daysLeft < 0 {
+			println("Domain:", domain, "- Expired", -daysLeft, "Days Ago - Expiry date:", domainData.ExpiryDate.Format("2006-01-02 15:04:05"))
+			continue
+		}
+
 		println("Domain:", domain, "- In", daysLeft, "Days - Expiry date:", domainData.ExpiryDate.Format("2006-01-02 15:04:05"))
 	}
 
