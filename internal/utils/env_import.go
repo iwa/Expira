@@ -65,6 +65,7 @@ func importDomains(store *state.DomainStore) string {
 
 		domainMap[domain] = state.Domain{
 			Name:       domain,
+			Exists:     false,
 			ExpiryDate: time.Unix(0, 0), // Default expiry date
 		}
 	}
