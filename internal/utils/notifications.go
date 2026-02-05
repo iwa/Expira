@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/iwa/Expira/internal/state"
 	"github.com/iwa/Expira/internal/utils/providers"
@@ -16,7 +15,7 @@ func Notify(store *state.DomainStore, config *state.Config) {
 	domains := store.GetAllDomains()
 
 	for domain, domainData := range domains {
-		daysUntil, shouldNotify := checkDaysForNotification(domainData.ExpiryDate, config.NotificationDays)
+		daysUntil, shouldNotify := checkDaysForNotification(domainData, config.NotificationDays)
 
 		if shouldNotify {
 			if config.TelegramNotification && (config.TelegramChatID != "" && config.TelegramToken != "") {
@@ -49,18 +48,17 @@ func Notify(store *state.DomainStore, config *state.Config) {
 	}
 }
 
-func checkDaysForNotification(expriyDate time.Time, notificationDays []int) (int, bool) {
-	currentTime := time.Now()
-	daysLeft := int(expriyDate.Sub(currentTime).Hours()/24) + 1 // Add 1 to include the current day
+func checkDaysForNotification(domain state.Domain, notificationDays []int) (int, bool) {
+	daysLeft := domain.GetDaysUntilExpiry()
 
 	if daysLeft < 0 {
-		println("[WARN] Domain", expriyDate.Format("2006-01-02 15:04:05"), "has already expired.")
+		println("[WARN] Domain", domain.Name, "has already expired.", domain.ExpiryDate.Format("2006-01-02 15:04:05"))
 		return 0, false
 	}
 
 	for _, days := range notificationDays {
 		if daysLeft == days {
-			println("[INFO] Domain expiry is exactly", days, "days away:", expriyDate.Format("2006-01-02 15:04:05"))
+			println("[INFO] Domain expiry is exactly", days, "days away:", domain.ExpiryDate.Format("2006-01-02 15:04:05"))
 			return days, true
 		}
 	}
