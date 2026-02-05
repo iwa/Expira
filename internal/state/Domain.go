@@ -8,8 +8,8 @@ type Domain struct {
 	ExpiryDate time.Time
 }
 
-// Calculate how many days remaining until Domain expiry date
-// Diff is calculated from time.Now()
+// Calculate how many days between now and Domain expiry
+// Diff is calculated using time.Now()
 //
 // If the domain is already expired, returns -1
 func (d *Domain) GetDaysUntilExpiry() int {
